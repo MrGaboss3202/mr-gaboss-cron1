@@ -9,10 +9,13 @@ jobs:
   inactive_report:
     runs-on: ubuntu-latest
 
-    # ✅ PONLOS A NIVEL JOB (más confiable)
+    # ✅ Variables a nivel JOB (incluye tus secrets + parámetros del purge)
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      INACTIVE_DAYS: "365"
+      INACTIVE_LIMIT: "1000"
+      DRY_RUN: "true" # ⛔ Primero así (solo simula). Cambia a "false" para borrar de verdad.
 
     steps:
       - name: Checkout
@@ -32,7 +35,7 @@ jobs:
         run: |
           if [ -z "$SUPABASE_URL" ]; then echo "SUPABASE_URL MISSING"; exit 1; fi
           if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then echo "SUPABASE_SERVICE_ROLE_KEY MISSING"; exit 1; fi
-          echo "Env OK"
+          echo "Env OK (DAYS=$INACTIVE_DAYS LIMIT=$INACTIVE_LIMIT DRY_RUN=$DRY_RUN)"
 
-      - name: Run inactive report
+      - name: Run inactive purge
         run: node scripts/inactive-report.mjs
